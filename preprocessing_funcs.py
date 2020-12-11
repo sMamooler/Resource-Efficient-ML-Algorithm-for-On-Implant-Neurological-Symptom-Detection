@@ -117,3 +117,28 @@ def get_spikes_with_history(neural_data,bins_before,bins_after,bins_current=1):
         X[i+bins_before,:,:]=neural_data[start_idx:end_idx,:] #Put neural data from surrounding bins in X, starting at row "bins_before"
         start_idx=start_idx+1;
     return X
+
+
+def standardize(data):
+    means = np.mean(data, axis=1, keepdims=True)
+    stds = np.std(data, axis=1, keepdims=True)
+    standardized_data = (data - means) / stds
+
+    return standardized_data
+
+
+def remove_outliers(data):
+    """replace the outliers (values more than mean+3*std and less than mean-3*std ) with the closet bound """
+    for f in data.T:
+        mean = np.mean(f, axis=0)
+        std = np.std(f, axis=0)
+        edge = std * 3
+        lowerb = mean - edge
+        upperb = mean + edge
+        for i,x in enumerate(f):
+            if x<lowerb:
+                f[i]=lowerb
+            elif x>upperb:
+                f[i]=upperb
+                
+    return data
