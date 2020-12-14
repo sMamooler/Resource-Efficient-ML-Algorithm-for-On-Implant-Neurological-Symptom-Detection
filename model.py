@@ -59,16 +59,49 @@ class LSTM(nn.Module):
             the index of the layer to be binarized
       
         """ 
+      
         net = self.lstm2
-        tol = 1e-5
         if ind_layer == 0:
             net = self.lstm
-        weights = net.weight_ih_l0
-        for idx, w_ in enumerate(weights) : 
+        for item in net.state_dict().items():
+            weight_name = item[0]
+            weights_mat = item[1]
+            for idx, w_ in enumerate(weights_mat) : 
             with torch.no_grad():
-                arr = net.weight_ih_l0[idx]
-                arr = np.round(arr, 1)*10
-                net.weight_ih_l0[idx] = arr
+                arr = weights_mat[idx]
+                arr[arr>=0]=1 
+                arr[arr<0]=-1
+                weights_mat[idx] = arr
+        
+            net.state_dict()[weight_name]= weights_mat 
+            
+    def quantize_fixed_pt(self, ind_layer):
+
+        """
+        Function that does 3 decimal fixed point quantization on the weights of the layer
+
+        Parameters
+        ----------
+        ind_layer: int
+            the index of the layer to be quantized
+      
+        """ 
+      
+        net = self.lstm2
+        if ind_layer == 0:
+            net = self.lstm
+        for item in net.state_dict().items():
+            weight_name = item[0]
+            weights_mat = item[1]
+            for idx, w_ in enumerate(weights_mat) : 
+            with torch.no_grad():
+                arr = weights_mat[idx]
+                arr = np.round(arr,1)
+                weights_mat[idx] = arr
+        
+            net.state_dict()[weight_name]= weights_mat     
+            
+  
             
 
     def threshold_pruning(self):
@@ -123,13 +156,12 @@ class LSTM(nn.Module):
                 new_input[i] = input[:,i,:]
         
         
-            self.binarize_weights(0)
+            self.quantize_fixed_pt(0)
             r_output, hidden = self.lstm(new_input, hidden)
-            self.binarize_weights(1)
+            self.quantize_fixed_pt(1)
             r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
-            self.binarize_weights(2)
             out = self.fc(r_output)
             return out, hidden
 
