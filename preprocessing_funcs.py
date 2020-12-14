@@ -1,5 +1,5 @@
 import numpy as np
-
+from sklearn.preprocessing import StandardScaler
 
 ######## BIN_SPIKES ########
 def bin_spikes(spike_times,dt,wdw_start,wdw_end):
@@ -119,26 +119,32 @@ def get_spikes_with_history(neural_data,bins_before,bins_after,bins_current=1):
     return X
 
 
-def standardize(data):
-    means = np.mean(data, axis=1, keepdims=True)
-    stds = np.std(data, axis=1, keepdims=True)
-    standardized_data = (data - means) / stds
-
-    return standardized_data
 
 
-def remove_outliers(data):
-    """replace the outliers (values more than mean+3*std and less than mean-3*std ) with the closet bound """
-    for f in data.T:
-        mean = np.mean(f, axis=0)
-        std = np.std(f, axis=0)
-        edge = std * 3
-        lowerb = mean - edge
-        upperb = mean + edge
-        for i,x in enumerate(f):
-            if x<lowerb:
-                f[i]=lowerb
-            elif x>upperb:
-                f[i]=upperb
-                
-    return data
+
+def preprocessing(trainX, testX, trainY, testY) :
+    """
+    Function that pre-pocesses the data
+
+    Parameters
+    ----------
+    TrainX, TestX: numpy array of shape [#datapoints, input_dim]
+        contain feature vectors of train and test data
+    TrainY, TestY: numpy array of shape [#datapoints, 1]
+        contain labels of train and test data
+
+    Returns
+    -------
+    scaler: StandardScaler
+        scaler used to standardize the data
+    scaled_trainX, scaled_testX: numpy array of shape [#datapoints, input_dim]
+        scaled train and test feature vectors
+    trainY, testY: numpy array of shape [#datapoints, 1]
+        train and test labels
+    """ 
+    scaler = StandardScaler()
+    # fit and transform the data 
+    scaled_trainX = scaler.fit_transform(trainX)
+    scaled_testX = scaler.transform(testX)
+    
+    return scaler, scaled_trainX, scaled_testX, trainY, testY
