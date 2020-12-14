@@ -96,7 +96,7 @@ class LSTM(nn.Module):
             for idx, w_ in enumerate(weights_mat) : 
             with torch.no_grad():
                 arr = weights_mat[idx]
-                arr = np.round(arr,1)
+                arr = np.round(arr,3)
                 weights_mat[idx] = arr
         
             net.state_dict()[weight_name]= weights_mat     
