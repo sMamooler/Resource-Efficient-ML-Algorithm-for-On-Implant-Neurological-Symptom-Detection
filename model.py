@@ -43,9 +43,10 @@ class LSTM(nn.Module):
         
         #lstm layers
         self.lstm = nn.LSTM(self.input_dim, self.n_hidden, self.n_layers, batch_first=False)
-        self.lstm2 = nn.LSTM(self.n_hidden, self.n_hidden, self.n_layers, batch_first=False)
+        #self.lstm2 = nn.LSTM(self.n_hidden, self.n_hidden, self.n_layers, batch_first=False)
         #linear layer
         self.fc = nn.Linear(self.n_hidden, self.output_dim)
+        self.act = nn.ReLU()
     
     
     def binarize_weights(self, ind_layer):
@@ -59,7 +60,6 @@ class LSTM(nn.Module):
             the index of the layer to be binarized
       
         """ 
-      
         net = self.lstm2
         if ind_layer == 0:
             net = self.lstm
@@ -67,19 +67,19 @@ class LSTM(nn.Module):
             weight_name = item[0]
             weights_mat = item[1]
             for idx, w_ in enumerate(weights_mat) : 
-            with torch.no_grad():
-                arr = weights_mat[idx]
-                arr[arr>=0]=1 
-                arr[arr<0]=-1
-                weights_mat[idx] = arr
+                with torch.no_grad():
+                    arr = weights_mat[idx]
+                    arr[arr>=0]=1 
+                    arr[arr<0]=-1
+                    weights_mat[idx] = arr
         
-            net.state_dict()[weight_name]= weights_mat 
+            net.state_dict()[weight_name].copy_(weights_mat)
+            
             
     def quantize_fixed_pt(self, ind_layer):
 
         """
         Function that does 3 decimal fixed point quantization on the weights of the layer
-
         Parameters
         ----------
         ind_layer: int
@@ -94,23 +94,22 @@ class LSTM(nn.Module):
             weight_name = item[0]
             weights_mat = item[1]
             for idx, w_ in enumerate(weights_mat) : 
-            with torch.no_grad():
-                arr = weights_mat[idx]
-                arr = np.round(arr,3)
-                weights_mat[idx] = arr
+                with torch.no_grad():
+                    arr = weights_mat[idx]
+                    arr = np.round(arr,3)
+                    weights_mat[idx] = arr
         
-            net.state_dict()[weight_name]= weights_mat     
-            
-  
-            
+            net.state_dict()[weight_name].copy_(weights_mat)
 
     def threshold_pruning(self):
         """
         Function that pruns the weights
         """
-        parameters_to_prune = ((self.lstm, "weight_ih_l0"), (self.lstm2, "weight_ih_l0"), (self.fc, "weight"))
-        prune.global_unstructured(parameters_to_prune, pruning_method=ThresholdPruning, threshold= 0.075)
-        print("pruning")
+
+        for k in range(self.n_layers):
+            parameters_to_prune = ((self.lstm, "weight_ih_l"+str(k)), (self.lstm, "weight_hh_l"+str(k)), (self.lstm2, "weight_ih_l"+str(k)), (self.lstm2, "weight_hh_l"+str(k)))
+            prune.global_unstructured(parameters_to_prune, pruning_method=ThresholdPruning, threshold= 0.075)
+        
 
 
     def forward(self, input, hidden, bin_=False, quant=False):
@@ -142,14 +141,15 @@ class LSTM(nn.Module):
 
            
             r_output, hidden = self.lstm(new_input, hidden)
-            r_output, hidden = self.lstm2(r_output, hidden)
+            #r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
-            out = self.fc(r_output)
+            out = self.act(r_output)
+            out = self.fc(out)
+            
             return out, hidden
 
         if bin_:
-            print("bin")
             ##our input has shape [batch_size, seq_len, input_dim] but lstm wants [seq_len, batch_size, input_dim], we need to reconstrcut the input the way lstm wants:
             new_input = torch.ones((self.seq_len, input.shape[0], self.input_dim))
             for i in range(self.seq_len):
@@ -158,8 +158,8 @@ class LSTM(nn.Module):
         
             self.quantize_fixed_pt(0)
             r_output, hidden = self.lstm(new_input, hidden)
-            self.quantize_fixed_pt(1)
-            r_output, hidden = self.lstm2(r_output, hidden)
+            #self.quantize_fixed_pt(1)
+            #r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
             out = self.fc(r_output)
@@ -203,7 +203,7 @@ class LSTM(nn.Module):
             
 
             r_output, hidden = self.lstm(new_input, hidden)
-            r_output, hidden = self.lstm2(r_output, hidden)
+            #r_output, hidden = self.lstm2(r_output, hidden)
             out = self.fc(r_output)
             
             #change the weights back to quantized parameters once done with prediction

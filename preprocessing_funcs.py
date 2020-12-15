@@ -142,9 +142,31 @@ def preprocessing(trainX, testX, trainY, testY) :
     trainY, testY: numpy array of shape [#datapoints, 1]
         train and test labels
     """ 
-    scaler = StandardScaler()
+    x_scaler = StandardScaler()
+    y_scaler = StandardScaler()
     # fit and transform the data 
-    scaled_trainX = scaler.fit_transform(trainX)
-    scaled_testX = scaler.transform(testX)
+    scaled_trainX = x_scaler.fit_transform(trainX)
+    scaled_testX = x_scaler.transform(testX)
+
+    scaled_trainY = y_scaler.fit_transform(trainY)
+    scaled_testY = y_scaler.transform(testY)
     
-    return scaler, scaled_trainX, scaled_testX, trainY, testY
+    return x_scaler, y_scaler, scaled_trainX, scaled_testX, scaled_trainY,scaled_testY
+
+
+def remove_outliers(tX):
+    """replace the outliers (values more than mean+3*std and less than mean-3*std ) with the closet bound """
+    clean_data = []
+    for f in tX.T:
+        mean = np.mean(f, axis=0)
+        std = np.std(f, axis=0)
+        edge = std * 3
+        lowerb = mean - edge
+        upperb = mean + edge
+        for i,x in enumerate(f):
+            if x<lowerb:
+                f[i]=lowerb
+            elif x>upperb:
+                f[i]=upperb
+                
+    return tX

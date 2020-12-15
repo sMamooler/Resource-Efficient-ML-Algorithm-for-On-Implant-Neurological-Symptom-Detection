@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 
-from preprocessing_funcs import get_spikes_with_history, preprocessing
+from preprocessing_funcs import get_spikes_with_history, preprocessing, remove_outliers
 from model import LSTM
 from trainer import train
 from quantizer import quantize_network, compute_quantized_weights, quantized_train
@@ -47,7 +47,9 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             TestY = TestY.reshape(TestY.shape[0],1)
             
             # preprocessing 
-            scaler, TrainX, TestX, TrainY, TestY  = preprocessing(TrainX,TestX,TrainY,TestY)
+            TrainX = remove_outliers(TrainX)
+            
+            x_scaler, y_scaler, TrainX, TestX, TrainY, TestY  = preprocessing(TrainX,TestX,TrainY,TestY)
             
             
             # from here, we reconstruct the input by "looking back" a few steps
@@ -65,6 +67,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             # Now, we reconstructed TrainX/TestX to have a shape (num_of_samples, sequence_length, input_size)
             # We can fit this to the LSTM
             
+            print("Run for finger "+str(Finger))
 
             n_hidden = 20
             n_layers = 5
@@ -77,7 +80,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
 
             lossfunc = nn.MSELoss()
 
-            optimizer = torch.optim.Adamax(net.parameters())
+            optimizer = torch.optim.Adamax(net.parameters(), lr=0.002)
             net.train()
 
 
@@ -88,7 +91,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             else:
 
                 try:
-                    corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 5, clip = 5, Finger=Finger)
+                    corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 100, clip = 5, Finger=Finger)
                 except KeyboardInterrupt:
                     #save the model
                     print("saving...")
@@ -99,45 +102,60 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             ##test initial model
             net.eval()
             pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
-            pred = pred[-1,:,:].detach().numpy().reshape((-1,))
+            pred = pred.detach().numpy()
+            pred = y_scaler.inverse_transform(pred)
+            testY = y_scaler.inverse_transform(testY)
+            pred = pred[-1,:,:].reshape((-1,))
             corrcoef = np.corrcoef(pred,TestY.reshape((-1,)))
+
+            TestYShifted = TestY
+            #pred_tf = scaler.inverse_transform(pred)
+            x = np.arange(TestYShifted.shape[0])
+            
+           
+            fig_label = plt.figure(figsize=(15,10))
+            plt.title("Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
+            plt.plot(x, TestYShifted)
+            plt.plot(x, pred)
+            fig_label.savefig(figure_path + "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
+
+            
             print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=corrcoef[0,1]))   
 
 
             ############################################BINARIZATON#########################################################################
-            print("Binarization ======================================================================")
-            net.eval()
-            bin_pred, h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), bin_=True)
-            bin_pred = bin_pred[-1,:,:].detach().numpy().reshape((-1,))
-            bin_corrcoef = np.corrcoef(bin_pred,TestY.reshape((-1,)))
-
+            # print("Fixed Point Quantization======================================================================")
+            # net.eval()
+            # bin_pred, h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), bin_=True)
+            # bin_pred = bin_pred[-1,:,:].detach().numpy().reshape((-1,))
+            # bin_corrcoef = np.corrcoef(bin_pred,TestY.reshape((-1,)))
             
-            print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=bin_corrcoef[0,1]))   
+            # print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=bin_corrcoef[0,1]))   
 
             ##############################################PRUNING###########################################################################
-            print("Pruning============================================================================")
+            # print("Pruning============================================================================")
             
 
-            if pre_trained:
-                net.load_state_dict(torch.load('f'+str(Finger)+'_trained_pruned_model'))
-            else:
-                net.train()
-                net.threshold_pruning()
-                #train the prunned model:
-                try:
-                    corr_train, corr_val, corr_test = train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_epoch=10, clip = 5, Finger = Finger)
-                except KeyboardInterrupt:
-                    #save the model
-                    print("saving...")
-                PATH_pre_trained = 'f'+str(Finger)+'_trained_pruned_model'
-                torch.save(net.state_dict(), PATH_pre_trained)
-                print("trained pruned model saved")
+            # if pre_trained:
+            #     net.load_state_dict(torch.load('f'+str(Finger)+'_trained_pruned_model'))
+            # else:
+            #     net.train()
+            #     net.threshold_pruning()
+            #     #train the prunned model:
+            #     try:
+            #         corr_train, corr_val, corr_test = train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_epoch=10, clip = 5, Finger = Finger)
+            #     except KeyboardInterrupt:
+            #         #save the model
+            #         print("saving...")
+            #     PATH_pre_trained = 'f'+str(Finger)+'_trained_pruned_model'
+            #     torch.save(net.state_dict(), PATH_pre_trained)
+            #     print("trained pruned model saved")
 
-            net.eval()
-            prun_pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
-            prun_pred = prun_pred[-1,:,:].detach().numpy().reshape((-1,))
-            prun_corrcoef = np.corrcoef(prun_pred,TestY.reshape((-1,)))
-            print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=prun_corrcoef[0,1]))   
+            # net.eval()
+            # prun_pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
+            # prun_pred = prun_pred[-1,:,:].detach().numpy().reshape((-1,))
+            # prun_corrcoef = np.corrcoef(prun_pred,TestY.reshape((-1,)))
+            # print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=prun_corrcoef[0,1]))   
 
             ##############################################TRAINED QUANTIZATION##############################################################
             print("Trained Quantization===================================================================")
@@ -151,7 +169,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
                 net.train()
                 
                 #train the quantized netwok
-                quantized_corr_train, quantized_corr_val, quantized_corr_test = quantized_train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 10, clip = 5)
+                quantized_corr_train, quantized_corr_val, quantized_corr_test = quantized_train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 30, clip = 5)
                 #set the model's parameters to their quantized version
                 net = quantize_network(net)
                 torch.save(net.state_dict(), 'f'+str(Finger)+'_trained_quantized_model')
@@ -161,7 +179,21 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
 
             net.eval()
             quant_pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), quant=True)
-            quant_pred = quant_pred[-1,:,:].detach().numpy().reshape((-1,))
+            quant_pred = quant_pred.detach().numpy()
+            quant_pred = y_scaler.inverse_transform(quant_pred)
+            quant_pred = quant_pred[-1,:,:].reshape((-1,))
             quant_corrcoef = np.corrcoef(quant_pred,TestY.reshape((-1,)))
+
+            TestYShifted = TestY[20:,]
+            #pred_tf = scaler.inverse_transform(pred)
+            x = np.arange(TestYShifted.shape[0])
+            
+           
+            fig_label = plt.figure(figsize=(15,10))
+            plt.title("Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
+            plt.plot(x[2500:3400], TestYShifted[2500:3400,0])
+            plt.plot(x[2500:3400], quant_pred[2500:3400])
+            fig_label.savefig(figure_path + "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger) + "Quantized")
+
             print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=quant_corrcoef[0,1]))   
             
