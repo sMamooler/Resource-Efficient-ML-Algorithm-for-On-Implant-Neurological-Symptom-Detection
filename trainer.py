@@ -100,6 +100,7 @@ def train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_epoch = 60
             predt, ht = net(xt, ht)
             corrcoeft = np.corrcoef(predt[-1,:,:].detach().numpy().reshape((-1,)),yt.detach().numpy().reshape((-1,)))
             list_corr_test += [corrcoeft[0,1]]
+            
             print ('Correlation coefficient test: {corrcoef}'.format(corrcoef=corrcoeft[0,1]))
 
     return list_corr_train, list_corr_val, list_corr_test

@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 ######## BIN_SPIKES ########
 def bin_spikes(spike_times,dt,wdw_start,wdw_end):

@@ -104,7 +104,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
             pred = pred.detach().numpy()
             pred = y_scaler.inverse_transform(pred)
-            testY = y_scaler.inverse_transform(testY)
+            TestY = y_scaler.inverse_transform(TestY)
             pred = pred[-1,:,:].reshape((-1,))
             corrcoef = np.corrcoef(pred,TestY.reshape((-1,)))
 
@@ -184,15 +184,15 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             quant_pred = quant_pred[-1,:,:].reshape((-1,))
             quant_corrcoef = np.corrcoef(quant_pred,TestY.reshape((-1,)))
 
-            TestYShifted = TestY[20:,]
+            TestYShifted = TestY
             #pred_tf = scaler.inverse_transform(pred)
             x = np.arange(TestYShifted.shape[0])
             
            
             fig_label = plt.figure(figsize=(15,10))
             plt.title("Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
-            plt.plot(x[2500:3400], TestYShifted[2500:3400,0])
-            plt.plot(x[2500:3400], quant_pred[2500:3400])
+            plt.plot(x, TestYShifted)
+            plt.plot(x, quant_pred)
             fig_label.savefig(figure_path + "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger) + "Quantized")
 
             print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=quant_corrcoef[0,1]))   

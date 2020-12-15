@@ -162,7 +162,10 @@ class LSTM(nn.Module):
             #r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
-            out = self.fc(r_output)
+            out = self.act(r_output)
+            out = self.fc(out)
+            
+            
             return out, hidden
 
         if quant:
@@ -204,7 +207,9 @@ class LSTM(nn.Module):
 
             r_output, hidden = self.lstm(new_input, hidden)
             #r_output, hidden = self.lstm2(r_output, hidden)
-            out = self.fc(r_output)
+            out = self.act(r_output)
+            out = self.fc(out)
+            
             
             #change the weights back to quantized parameters once done with prediction
             self.load_state_dict(old_state_dict)
