@@ -10,7 +10,7 @@ from pruning import ThresholdPruning
 
 class LSTM(nn.Module):
     
-    def __init__(self, input_dim, output_dim, seq_len, n_hidden= 10 , n_layers = 1):
+    def __init__(self, input_dim, output_dim, seq_len, n_hidden= 10 , n_layers = 1, fixed_pt_quantize = False):
         """
         Function that initializes our lstm netwrok with two lstm layers and one linear layer
 
@@ -34,6 +34,7 @@ class LSTM(nn.Module):
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.seq_len = seq_len
+        self.fixed_pt_quantize = fixed_pt_quantize
 
 
         #used in quantization:
@@ -49,7 +50,7 @@ class LSTM(nn.Module):
         self.act = nn.Sigmoid()
     
     
-    def binarize_weights(self, ind_layer):
+    def binarize_weights(self):
 
         """
         Function that binarizes the parameters of the given layer
@@ -60,9 +61,8 @@ class LSTM(nn.Module):
             the index of the layer to be binarized
       
         """ 
-        net = self.lstm2
-        if ind_layer == 0:
-            net = self.lstm
+        
+        net = self.lstm
         for item in net.state_dict().items():
             weight_name = item[0]
             weights_mat = item[1]
@@ -76,20 +76,16 @@ class LSTM(nn.Module):
             net.state_dict()[weight_name].copy_(weights_mat)
             
             
-    def quantize_fixed_pt(self, ind_layer):
+    def quantize_fixed_pt(self):
 
         """
         Function that does 3 decimal fixed point quantization on the weights of the layer
         Parameters
         ----------
-        ind_layer: int
-            the index of the layer to be quantized
+        None
       
         """ 
-      
-        net = self.lstm2
-        if ind_layer == 0:
-            net = self.lstm
+        net = self.lstm
         for item in net.state_dict().items():
             weight_name = item[0]
             weights_mat = item[1]
@@ -112,7 +108,7 @@ class LSTM(nn.Module):
         
 
 
-    def forward(self, input, hidden, bin_=False, quant=False):
+    def forward(self, input, hidden, quant=False):
         """
         Function that forward pass through the network 
 
@@ -122,8 +118,6 @@ class LSTM(nn.Module):
             contain feature vectors of train data
         hidden: pair of matrices of shape [n_layer, batch_size, n_hidden]
             hidden/cell state of LSTM layers
-        bin_: boolean
-            if set, the network is binarized
         quant: boolean
             if set, the network is quantized
         Returns
@@ -133,7 +127,7 @@ class LSTM(nn.Module):
         hidden: pair of matrices of shape [n_layer, batch_size, n_hidden]
             hidden/cell state of LSTM layers
         """ 
-        if (not bin_) and (not quant):
+        if (not self.fixed_pt_quantize) and (not quant):
             ##our input has shape [batch_size, seq_len, input_dim] but lstm wants [seq_len, batch_size, input_dim], we need to reconstrcut the input the way lstm wants:
             new_input = torch.ones((self.seq_len, input.shape[0], self.input_dim))
             for i in range(self.seq_len):
@@ -141,27 +135,22 @@ class LSTM(nn.Module):
 
            
             r_output, hidden = self.lstm(new_input, hidden)
-            #r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
             out = self.act(r_output)
-            out = self.fc(out)
-            # out = self.act(out)
-           
+            out = self.fc(out)           
             
             return out, hidden
 
-        if bin_:
+        if self.fixed_pt_quantize:
             ##our input has shape [batch_size, seq_len, input_dim] but lstm wants [seq_len, batch_size, input_dim], we need to reconstrcut the input the way lstm wants:
             new_input = torch.ones((self.seq_len, input.shape[0], self.input_dim))
             for i in range(self.seq_len):
                 new_input[i] = input[:,i,:]
         
         
-            self.quantize_fixed_pt(0)
+            self.quantize_fixed_pt()
             r_output, hidden = self.lstm(new_input, hidden)
-            #self.quantize_fixed_pt(1)
-            #r_output, hidden = self.lstm2(r_output, hidden)
         
             ## put x through the fully-connected layer
             out = self.act(r_output)
