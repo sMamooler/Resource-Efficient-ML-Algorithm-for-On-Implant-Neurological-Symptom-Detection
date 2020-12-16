@@ -24,14 +24,16 @@ figure_path = os.path.join(root, 'figures')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pre_trained", help="Set to True if you want to use pre-trained model", type=bool)
+parser.add_argument("--fixed_pt_quantize", help="Set to True if you want to use fixed point quantization", type=bool)
 args = parser.parse_args()
 pre_trained = args.pre_trained
+fixed_pt_quantize = args.fixed_pt_quantize
 
 
 for Idx_subject in list([10]): # 3 subjects index 10-12
 
        
-        for Finger in list([1]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
+        for Finger in list([0]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
             
             #load training data (TrainX: feature vectors, TrainY: labels)
             matData = sio.loadmat(data_path + '/BCImoreData_Subj_'+str(Idx_subject)+'_200msLMP.mat')
@@ -75,7 +77,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             output_dim = TrainY.shape[1]
             seq_len =  TrainX.shape[1]
 
-            net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers)
+            net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers, fixed_pt_quantize = fixed_pt_quantize)
 
             lossfunc = nn.MSELoss()
 
@@ -122,14 +124,6 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=corrcoef[0,1]))   
 
 
-            ############################################BINARIZATON#########################################################################
-            # print("Fixed Point Quantization======================================================================")
-            # net.eval()
-            # bin_pred, h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), bin_=True)
-            # bin_pred = bin_pred[-1,:,:].detach().numpy().reshape((-1,))
-            # bin_corrcoef = np.corrcoef(bin_pred,TestY.reshape((-1,)))
-            
-            # print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=bin_corrcoef[0,1]))   
 
             ##############################################PRUNING###########################################################################
             # print("Pruning============================================================================")
