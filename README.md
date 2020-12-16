@@ -10,7 +10,7 @@ In this project, we focus on developing an efficient Machine Learning model to p
 ```shell
 make install  # install the Python requirements and setup the paths
 ```
-Download [trajectories from ECoG](https://drive.google.com/drive/folders/1DZC1ubNQzW-WndqRS7ZwRBGDofP2fSM3?usp=sharing), and the [pre-trained weights](https://drive.google.com/drive/folders/1DZC1ubNQzW-WndqRS7ZwRBGDofP2fSM3?usp=sharing). The folder structure should look like:
+Download [trajectories from ECoG](https://drive.google.com/drive/folders/1DZC1ubNQzW-WndqRS7ZwRBGDofP2fSM3?usp=sharing), and the [pre-trained weights](https://drive.google.com/drive/folders/1-3C1Bt_H1_m98DUsWuLcTJG8oWbvETU4?usp=sharing). The folder structure should look like:
 ```
 $drive
 |-- data
