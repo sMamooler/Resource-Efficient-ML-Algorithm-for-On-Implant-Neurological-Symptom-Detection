@@ -31,7 +31,7 @@ pre_trained = args.pre_trained
 for Idx_subject in list([10]): # 3 subjects index 10-12
 
        
-        for Finger in list([0]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
+        for Finger in list([1]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
             
             #load training data (TrainX: feature vectors, TrainY: labels)
             matData = sio.loadmat(data_path + '/BCImoreData_Subj_'+str(Idx_subject)+'_200msLMP.mat')
@@ -58,7 +58,6 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             bins_after=0 #How many bins of neural data after the output are used for decoding
             
             TrainX=get_spikes_with_history(TrainX,bins_before,bins_after,bins_current)
-
             TrainX, TrainY = TrainX[bins_before:,:,:], TrainY[bins_before:,]
          
             TestX=get_spikes_with_history(TestX,bins_before,bins_after,bins_current)
@@ -91,7 +90,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             else:
 
                 try:
-                    corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 100, clip = 5, Finger=Finger)
+                    corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 70, clip = 5, Finger=Finger)
                 except KeyboardInterrupt:
                     #save the model
                     print("saving...")
@@ -102,10 +101,10 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             ##test initial model
             net.eval()
             pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
-            pred = pred.detach().numpy()
+            pred = pred.detach().numpy()[-1,:,:]
             pred = y_scaler.inverse_transform(pred)
             TestY = y_scaler.inverse_transform(TestY)
-            pred = pred[-1,:,:].reshape((-1,))
+            pred = pred.reshape((-1,))
             corrcoef = np.corrcoef(pred,TestY.reshape((-1,)))
 
             TestYShifted = TestY
@@ -179,9 +178,9 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
 
             net.eval()
             quant_pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), quant=True)
-            quant_pred = quant_pred.detach().numpy()
+            quant_pred = quant_pred.detach().numpy()[-1,:,:]
             quant_pred = y_scaler.inverse_transform(quant_pred)
-            quant_pred = quant_pred[-1,:,:].reshape((-1,))
+            quant_pred = quant_pred.reshape((-1,))
             quant_corrcoef = np.corrcoef(quant_pred,TestY.reshape((-1,)))
 
             TestYShifted = TestY

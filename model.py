@@ -46,7 +46,7 @@ class LSTM(nn.Module):
         #self.lstm2 = nn.LSTM(self.n_hidden, self.n_hidden, self.n_layers, batch_first=False)
         #linear layer
         self.fc = nn.Linear(self.n_hidden, self.output_dim)
-        self.act = nn.ReLU()
+        self.act = nn.Sigmoid()
     
     
     def binarize_weights(self, ind_layer):
@@ -146,6 +146,8 @@ class LSTM(nn.Module):
             ## put x through the fully-connected layer
             out = self.act(r_output)
             out = self.fc(out)
+            # out = self.act(out)
+           
             
             return out, hidden
 
@@ -164,6 +166,7 @@ class LSTM(nn.Module):
             ## put x through the fully-connected layer
             out = self.act(r_output)
             out = self.fc(out)
+           
             
             
             return out, hidden

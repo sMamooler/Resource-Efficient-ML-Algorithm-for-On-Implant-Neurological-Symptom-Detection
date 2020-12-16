@@ -143,7 +143,7 @@ def preprocessing(trainX, testX, trainY, testY) :
         train and test labels
     """ 
     x_scaler = StandardScaler()
-    y_scaler = StandardScaler()
+    y_scaler = MinMaxScaler(feature_range=(0,1)) #StandardScaler()
     # fit and transform the data 
     scaled_trainX = x_scaler.fit_transform(trainX)
     scaled_testX = x_scaler.transform(testX)
@@ -151,7 +151,7 @@ def preprocessing(trainX, testX, trainY, testY) :
     scaled_trainY = y_scaler.fit_transform(trainY)
     scaled_testY = y_scaler.transform(testY)
     
-    return x_scaler, y_scaler, scaled_trainX, scaled_testX, scaled_trainY,scaled_testY
+    return x_scaler, y_scaler, scaled_trainX, scaled_testX, scaled_trainY, scaled_testY
 
 
 def remove_outliers(tX):
