@@ -1,5 +1,9 @@
 # cs-433-project-2-outliers
  Resource-Efficient Machine Learning Algorithm Designfor On-Implant Neurological Symptom Detection
+ 
+In this project, we focus on developing an efficient Machine Learning model to process neural data in real time, with low power consumption, small on-chip area and fast inference.
+
+
 
 
 ## Installation
