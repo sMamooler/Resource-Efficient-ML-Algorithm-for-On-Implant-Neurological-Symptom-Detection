@@ -25,13 +25,13 @@ The figures will be geberated by [run.py]() and be stored in drive/figures.
 
 run.py consists of 4 parts:
 1. The first part which concerns the main model.
-2. BINARIZATON&FP_QUANTIZATION which peforms weight binarization and fixed point uantization.
-3. PRUNING which applies the punning method
+2. BINARIZATON&FP_QUANTIZATION which peforms weight binarization and fixed point quantization.
+3. PRUNING which applies the pruning method
 4. TRAINED QUANTIZATION which applies the trained quantization and weight sharing method.
 
 ### Note that you cannot use Binaization, Prunning, and Trained Qunatization at the same time. So, when trying each of them make sure to comment the other two parts.
 
-You can run run.py with pre-trained weights with the following commnad:
+You can run run.py with pre-trained weights with the following command:
 ```shell
 python run.py --pre-tarined=True 
 ```
@@ -44,11 +44,11 @@ python run.py
 
 You can adjust the number of epochs for training in run.py. The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
 
-In [fpoint_quantization.ipynb]() you can repoduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
+In [fpoint_quantization.ipynb]() you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
 
-In [pruning.ipynb]() you can repoduce the results published in the report for the Pruning method. 
+In [pruning.ipynb]() you can reproduce the results published in the report for the Pruning method. 
 
-In [trained_quantization.ipynb]() you can repoduce the results published in the report for the Trained Quantization and Weight Sharing method. 
+In [trained_quantization.ipynb]() you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. 
 
 
 ## Authors
