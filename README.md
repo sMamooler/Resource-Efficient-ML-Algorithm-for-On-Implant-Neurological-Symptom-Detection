@@ -33,7 +33,7 @@ python run.py
 ### Fixed Point Quantization
 For applying Fixed Point Quantization run:
 ```shell
-python run.py --fixed_pt_quantization=Tue
+python run.py --fixed_pt_quantization=True
 ```
 ### Pruning
 For applying Pruning run:
