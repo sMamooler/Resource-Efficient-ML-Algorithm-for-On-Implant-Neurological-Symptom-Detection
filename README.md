@@ -38,7 +38,7 @@ python run.py --fixed_pt_quantization=Tue
 ### Pruning
 For applying Pruning run:
 ```shell
-python run.py --prunning=True
+python run.py --pruning=True
 ```
 ### Trained Quantization and Weight Sharing:
 For applying Trained Quantization and Weight Sharing run:
