@@ -19,7 +19,7 @@ $drive
 `-- figures
 ```
 
-The figures will be geberated by [run.py](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/run.py) and be stored in drive/figures.
+The drive directory should be in the same directory where you run the code. The figures will be geberated by [run.py](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/run.py) and be stored in drive/figures.
 
 ## Usage
 
