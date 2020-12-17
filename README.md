@@ -23,7 +23,7 @@ The drive directory should be in the same directory where you run the code. The 
 
 ## Usage
 
-### In the aseline model and Fixed Point Quantization you can use pre-trained weights by adding --pre-trained=True to the command.
+### In the baseline model and Fixed Point Quantization you can use pre-trained weights by adding --pre-trained=True to the command.
 
 ### Baseline Model
 For using the baseline model with no compression run:
