@@ -174,22 +174,6 @@ def quantized_train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_
             
     
         pbar.update(1)
-        # corrcoef = np.corrcoef(pred[-1,:,:].detach().numpy().reshape((-1,)),y.detach().numpy().reshape((-1,)))
-        # list_corr_train += [corrcoef[0,1]]
-        # print ('Epoch [%d/%d], Loss: %.4f' %(epoch+1, num_epoch, loss.item()))
-        # print ('Correlation coefficient train : {corrcoef}'.format(corrcoef=corrcoef[0,1]))
-
-        # net.eval()
-        # with torch.no_grad():
-        #     predv, hv = net(xv, hv)
-        #     corrcoefv = np.corrcoef(predv[-1,:,:].detach().numpy().reshape((-1,)),yv.detach().numpy().reshape((-1,)))
-        #     list_corr_val += [corrcoefv[0,1]]
-        #     print ('Correlation coefficient validation: {corrcoef}'.format(corrcoef=corrcoefv[0,1]))
-
-        #     predt, ht = net(xt, ht)
-        #     corrcoeft = np.corrcoef(predt[-1,:,:].detach().numpy().reshape((-1,)),yt.detach().numpy().reshape((-1,)))
-        #     list_corr_test += [corrcoeft[0,1]]
-        #     print ('Correlation coefficient test: {corrcoef}'.format(corrcoef=corrcoeft[0,1]))
 
     return list_corr_train, list_corr_val, list_corr_test
    
