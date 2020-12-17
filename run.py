@@ -84,9 +84,10 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers, fixed_pt_quantize = fixed_pt_quantize)
 
             lossfunc = nn.MSELoss()
-            optimizer = torch.optim.Adamax(net.parameters(), lr=0.002)
+            lr = 0.002
             if fixed_pt_quantize:
-              optimizer = torch.optim.Adamax(net.parameters(), lr=0.003)
+              lr = 0.003
+            optimizer = torch.optim.Adamax(net.parameters(), lr=lr)
 
            
             print("Baseline ===================================================================")
