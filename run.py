@@ -36,10 +36,10 @@ pruning = args.pruning
 trained_quantization = args.trained_quantization
 
 
-for Idx_subject in list([12]): # 3 subjects index 10-12
+for Idx_subject in list([10]): # 3 subjects index 10-12
 
        
-        for Finger in list([0,1,2,3,4]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
+        for Finger in list([0]): # 5 fingers for each subject. 0:thumb, 1:index, 2:middle ...
             
             #load training data (TrainX: feature vectors, TrainY: labels)
             matData = sio.loadmat(data_path + '/BCImoreData_Subj_'+str(Idx_subject)+'_200msLMP.mat')
@@ -93,58 +93,22 @@ for Idx_subject in list([12]): # 3 subjects index 10-12
             optimizer = torch.optim.Adamax(net.parameters(), lr=lr)
 
 
-           ##############################################BASELINE###########################################################################
-            # print("Baseline ===================================================================")
-            # ##training the initial model
-            # if fixed_pt_quantize:
-            #     figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_fp_quant"
-            #     PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_fp_trained_model'
-            # else:
-            #     figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_baseline"
-            #     PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
-            # if pre_trained and fixed_pt_quantize:
-            #     net = torch.load(PATH_pre_trained)
-            # elif pre_trained:
-            #     net.load_state_dict(torch.load(PATH_pre_trained))
-
-            # else:
-            #     net.train()
-            #     try:
-            #         corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 200, clip = 5, Finger=Finger)
-            #     except KeyboardInterrupt:
-            #         #save the model
-            #         print("saving...")
-                
-            #     torch.save(net.state_dict(), PATH_pre_trained)
-            #     print("model saved")
-
-            # ##test baseline model
-            # net.eval()
-            # pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
-
-            
-
-
             ##############################################PRUNING###########################################################################
             if pruning:
                 print("Pruning============================================================================")
-                PATH_pre_trained_prun = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_pruned_model'
                 figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_pruning"
 
-                if pre_trained:
-                    net.load_state_dict(torch.load(PATH_pre_trained_prun))
-                else:
-                    net.train()
-                    net.threshold_pruning()
-                    #train the prunned model:
-                    try:
-                        corr_train, corr_val, corr_test = train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_epoch=10, clip = 5, Finger = Finger)
-                    except KeyboardInterrupt:
-                        #save the model
-                        print("saving...")
-                    
-                    torch.save(net.state_dict(), PATH_pre_trained_prun)
-                    print("trained pruned model saved")
+                PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
+                net.load_state_dict(torch.load(PATH_pre_trained))
+                net.train()
+                net.threshold_pruning()
+                #train the prunned model:
+                try:
+                    corr_train, corr_val, corr_test = train(TrainX, TrainY, TestX, TestY, net, lossfunc, optimizer, num_epoch=10, clip = 5, Finger = Finger)
+                except KeyboardInterrupt:
+                    #save the model
+                    print("saving...")
+                
 
                 net.eval()
                 pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
@@ -153,29 +117,55 @@ for Idx_subject in list([12]): # 3 subjects index 10-12
             ##############################################TRAINED QUANTIZATION##############################################################
             elif trained_quantization:
                 print("Trained Quantization===================================================================")
-                PATH_pre_trained_quant = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_quantized_model'
                 figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_trained_quant"
-                if pre_trained:
-                    net.load_state_dict(torch.load(PATH_pre_trained_quant))
-                else:
-                    PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
-                    net.load_state_dict(torch.load(PATH_pre_trained))
-                    k=8
-                    #initialize the quantiezed weights using the weights from the trained netwrok:
-                    net = compute_quantized_weights(net,k)
-                    net.train()
-                    
-                    #train the quantized netwok
-                    quantized_corr_train, quantized_corr_val, quantized_corr_test = quantized_train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 60, clip = 5)
-                    #set the model's parameters to their quantized version
-                    net = quantize_network(net)
-                    torch.save(net.state_dict(), PATH_pre_trained_quant)
-                    print("trained quantized model saved!")
-
-                    
-
+               
+                PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
+                net.load_state_dict(torch.load(PATH_pre_trained))
+                k=8
+                #initialize the quantiezed weights using the weights from the trained netwrok:
+                net = compute_quantized_weights(net,k)
+                net.train()
+                
+                #train the quantized netwok
+                quantized_corr_train, quantized_corr_val, quantized_corr_test = quantized_train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 60, clip = 5)
+                #set the model's parameters to their quantized version
+                net = quantize_network(net)
+               
+                
                 net.eval()
                 pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]), quant=True)
+            
+            #############################################BASELINE###########################################################################
+            else:
+                print("Baseline ===================================================================")
+                ##training the initial model
+                if fixed_pt_quantize:
+                    figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_fp_quant"
+                    PATH_pre_trained = checkpoint_path + '/Sbj' + str(Idx_subject) + 'f'+str(Finger)+'_trained_model_fixed_pt_quantization'+str(fixed_pt_quantize)
+                else:
+                    figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_baseline"
+                    PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
+                
+                if pre_trained and fixed_pt_quantize:
+                    net = torch.load(PATH_pre_trained)
+                elif pre_trained:
+                    net.load_state_dict(torch.load(PATH_pre_trained))
+
+                else:
+                    net.train()
+                    try:
+                        corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 200, clip = 5, Finger=Finger)
+                    except KeyboardInterrupt:
+                        #save the model
+                        print("saving...")
+                    
+                    torch.save(net.state_dict(), PATH_pre_trained)
+                    print("model saved")
+
+                ##test baseline model
+                net.eval()
+                pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
+
                
 
             
@@ -188,7 +178,6 @@ for Idx_subject in list([12]): # 3 subjects index 10-12
             TestYShifted = TestY
             x = np.arange(TestYShifted.shape[0])
             
-           
             fig_label = plt.figure(figsize=(15,10))
             plt.title("Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
             plt.plot(x, TestYShifted)
