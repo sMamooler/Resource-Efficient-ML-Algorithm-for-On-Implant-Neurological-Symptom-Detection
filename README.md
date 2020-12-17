@@ -19,7 +19,7 @@ $drive
 `-- figures
 ```
 
-The figures will be geberated by [run.py]() and be stored in drive/figures.
+The figures will be geberated by [run.py](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/run.py) and be stored in drive/figures.
 
 ## Usage
 
@@ -51,13 +51,13 @@ python run.py --trained_quantization=True
 
 
 
-You can adjust the number of epochs for training in [run.py]() The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
+You can adjust the number of epochs for training in [run.py](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/run.py) The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
 
-In [fpoint_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/Sepideh/fpoint_quantization.ipynb) you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
+In [fpoint_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/fpoint_quantization.ipynb) you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
 
 In [pruning.ipynb]() you can reproduce the results published in the report for the Pruning method. 
 
-In [trained_quantization.ipynb]() you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. Note that as kmeans clustering is not deterministic you might get slightly different esults that the ones in the report.
+In [trained_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/trained_quantization.ipynb) you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. Note that as kmeans clustering is not deterministic you might get slightly different esults that the ones in the report.
 
 
 ## Authors
