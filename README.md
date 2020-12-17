@@ -53,7 +53,7 @@ python run.py --trained_quantization=True
 
 You can adjust the number of epochs for training in [run.py]() The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
 
-In [fpoint_quantization.ipynb](https://colab.research.google.com/drive/1rGravPxwVioYO1rXuB-WGNABkLzPQfhW#scrollTo=HfEi1YN_1BSf) you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
+In [fpoint_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/Sepideh/fpoint_quantization.ipynb) you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
 
 In [pruning.ipynb]() you can reproduce the results published in the report for the Pruning method. 
 
