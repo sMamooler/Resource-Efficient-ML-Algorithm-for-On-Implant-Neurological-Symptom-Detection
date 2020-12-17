@@ -92,7 +92,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             ##training the initial model
             if fixed_pt_quantize:
                 figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_fp_quant"
-                PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_fp_trained_model'
+                PATH_pre_trained = checkpoint_path + '/Sbj' + str(Idx_subject) + 'f'+str(Finger)+'_trained_model_fixed_pt_quantization'+str(fixed_pt_quantize)
             else:
                 figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_baseline"
                 PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
