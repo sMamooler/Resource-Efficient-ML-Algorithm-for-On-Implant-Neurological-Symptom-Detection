@@ -56,7 +56,7 @@ You can adjust the number of epochs for training in [run.py](https://github.com/
 
 In [fpoint_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/fpoint_quantization.ipynb) you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
 
-In [pruning.ipynb]() you can reproduce the results published in the report for the Pruning method. 
+In [pruning.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/pruning.ipynb) you can reproduce the results published in the report for the Pruning method. 
 
 In [trained_quantization.ipynb](https://github.com/CS-433/cs-433-project-2-outliers/blob/main/trained_quantization.ipynb) you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. Note that as kmeans clustering is not deterministic you might get slightly different esults that the ones in the report.
 
