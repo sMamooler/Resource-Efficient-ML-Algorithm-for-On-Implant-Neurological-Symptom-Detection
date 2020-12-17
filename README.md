@@ -23,7 +23,7 @@ The drive directory should be in the same directory where you run the code. The 
 
 ## Usage
 
-### In the aseline model and Fixed Point Quantization you can use pre-trained weights by adding --pre-trained=True to the command
+### In the aseline model and Fixed Point Quantization you can use pre-trained weights by adding --pre-trained=True to the command.
 
 ### Baseline Model
 For using the baseline model with no compression run:
@@ -47,7 +47,8 @@ python run.py --trained_quantization=True
 ```
 
 
-### Note that you cannot use Fixed Point Quantization, Prunning, and Trained Qunatization at the same time.
+
+### Note that for Pruning and Trained Quantization and Weight Sharing you need the pre-trained baseline model.Moreover, you cannot use Fixed Point Quantization, Prunning, and Trained Qunatization at the same time. 
 
 
 
