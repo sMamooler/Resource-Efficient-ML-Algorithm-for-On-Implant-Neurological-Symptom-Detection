@@ -102,7 +102,9 @@ for Idx_subject in list([12]): # 3 subjects index 10-12
             # else:
             #     figure_name = "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger)+"_baseline"
             #     PATH_pre_trained = checkpoint_path + '/s'+ str(Idx_subject) + '_f'+str(Finger)+'_trained_model'
-            # if pre_trained:
+            # if pre_trained and fixed_pt_quantize:
+            #     net = torch.load(PATH_pre_trained)
+            # elif pre_trained:
             #     net.load_state_dict(torch.load(PATH_pre_trained))
 
             # else:
