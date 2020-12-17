@@ -23,32 +23,41 @@ The figures will be geberated by [run.py]() and be stored in drive/figures.
 
 ## Usage
 
-run.py consists of 4 parts:
-1. The first part which concerns the main model.
-2. BINARIZATON&FP_QUANTIZATION which peforms weight binarization and fixed point quantization.
-3. PRUNING which applies the pruning method
-4. TRAINED QUANTIZATION which applies the trained quantization and weight sharing method.
+### In all following cases you can use pe-trained weights by adding --pre-tarined=True to the command
 
-### Note that you cannot use Binaization, Prunning, and Trained Qunatization at the same time. So, when trying each of them make sure to comment the other two parts.
-
-You can run run.py with pre-trained weights with the following command:
+### Baseline Model
+For using the baseline model with no compression run:
 ```shell
-python run.py --pre-tarined=True 
+python run.py
+```
+### Fixed Point Quantization
+For applying Fixed Point Quantization run:
+```shell
+python run.py --fixed_pt_quantization=Tue
+```
+### Pruning
+For applying Pruning run:
+```shell
+python run.py --prunning=True
+```
+### Trained Quantization and Weight Sharing:
+For applying Trained Quantization and Weight Sharing run:
+```shell
+python run.py --trained_quantization=True
 ```
 
-If you want to train the models from scratch use the following command:
 
-```shell
-python run.py  
-```
+### Note that you cannot use Fixed Point Quantization, Prunning, and Trained Qunatization at the same time.
 
-You can adjust the number of epochs for training in run.py. The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
+
+
+You can adjust the number of epochs for training in [run.py]() The training can be interupted by ctrl+c and the weights will be saved in checkpoints directory.
 
 In [fpoint_quantization.ipynb]() you can reproduce the results published in the report for the Binarization and Fixed-Point Quantization method. 
 
 In [pruning.ipynb]() you can reproduce the results published in the report for the Pruning method. 
 
-In [trained_quantization.ipynb]() you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. 
+In [trained_quantization.ipynb]() you can reproduce the results published in the report for the Trained Quantization and Weight Sharing method. Note that as kmeans clustering is not deterministic you might get slightly different esults that the ones in the report.
 
 
 ## Authors
