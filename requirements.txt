@@ -1,0 +1,7 @@
+numpy
+tqdm
+jupyter
+scikit-learn
+matplotlib
+argparse
+torch==1.7.0
