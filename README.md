@@ -64,6 +64,6 @@ In [trained_quantization.ipynb]() you can reproduce the results published in the
 
 Chabenat Eugénie : eugenie.chabenat@epfl.ch
 
-Djambazovska Sara : sara.djambazovka@epfl.ch
+Djambazovska Sara : sara.djambazovska@epfl.ch
 
 Mamooler Sepideh : sepideh.mamooler@epfl.ch
