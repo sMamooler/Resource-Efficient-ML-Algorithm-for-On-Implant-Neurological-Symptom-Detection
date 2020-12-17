@@ -24,10 +24,9 @@ figure_path = os.path.join(root, 'figures')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pre_trained", help="Set to True if you want to use pre-trained model", type=bool)
-parser.add_argument("--fixed_pt_quantize", help="Set to True if you want to use fixed point quantization", type=bool)
 args = parser.parse_args()
 pre_trained = args.pre_trained
-fixed_pt_quantize = args.fixed_pt_quantize
+
 
 
 for Idx_subject in list([10]): # 3 subjects index 10-12
@@ -77,7 +76,7 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             output_dim = TrainY.shape[1]
             seq_len =  TrainX.shape[1]
 
-            net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers, fixed_pt_quantize = fixed_pt_quantize)
+            net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers)
 
             lossfunc = nn.MSELoss()
 
@@ -124,6 +123,49 @@ for Idx_subject in list([10]): # 3 subjects index 10-12
             print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=corrcoef[0,1]))   
 
 
+
+
+            ##############################################FIXED POINT QUANTIZATION###########################################################################
+
+            #net = LSTM(input_dim, output_dim, seq_len,  n_hidden, n_layers, fixed_pt_quantize = True)
+            #net.train()
+
+            ##training the initial model
+            #if pre_trained:
+            #    net.load_state_dict(torch.load('f'+str(Finger)+'_trained_model'))
+
+            #else:
+
+            #    try:
+            #        corr_train, corr_val, corr_test = train(TrainX, TrainY,TestX,TestY, net, lossfunc, optimizer, num_epoch = 70, clip = 5, Finger=Finger)
+            #    except KeyboardInterrupt:
+                    #save the model
+            #        print("saving...")
+            #    PATH_pre_trained = 'f'+str(Finger)+'_trained_model'
+            #    torch.save(net.state_dict(), PATH_pre_trained)
+            #    print("model saved")
+
+            ##test initial model
+            #net.eval()
+            #pred,h = net(torch.from_numpy(TestX).float(), net.init_hidden(TestX.shape[0]))
+            #pred = pred.detach().numpy()[-1,:,:]
+            #pred = y_scaler.inverse_transform(pred)
+            #TestY = y_scaler.inverse_transform(TestY)
+            #pred = pred.reshape((-1,))
+            #corrcoef = np.corrcoef(pred,TestY.reshape((-1,)))
+
+            #TestYShifted = TestY
+            #pred_tf = scaler.inverse_transform(pred)
+            #x = np.arange(TestYShifted.shape[0])
+           
+            #fig_label = plt.figure(figsize=(15,10))
+            #plt.title("Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
+            #plt.plot(x, TestYShifted)
+            #plt.plot(x, pred)
+            #fig_label.savefig(figure_path + "/Subject_" + str(Idx_subject) + "_Finger_"+str(Finger))
+
+            
+            #print ('Correlation coefficient test : {corrcoef}'.format(corrcoef=corrcoef[0,1]))   
 
             ##############################################PRUNING###########################################################################
             # print("Pruning============================================================================")
