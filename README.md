@@ -48,7 +48,7 @@ python run.py --trained_quantization=True
 
 
 
-### Note that for Pruning and Trained Quantization and Weight Sharing you need the pre-trained baseline model.Moreover, you cannot use Fixed Point Quantization, Prunning, and Trained Qunatization at the same time. 
+### Note that for Pruning and Trained Quantization and Weight Sharing you need the pre-trained baseline model. Moreover, you cannot use Fixed Point Quantization, Prunning, and Trained Qunatization at the same time. 
 
 
 
