@@ -103,8 +103,8 @@ class LSTM(nn.Module):
         """
 
         for k in range(self.n_layers):
-            parameters_to_prune = ((self.lstm, "weight_ih_l"+str(k)), (self.lstm, "weight_hh_l"+str(k)), (self.lstm2, "weight_ih_l"+str(k)), (self.lstm2, "weight_hh_l"+str(k)))
-            prune.global_unstructured(parameters_to_prune, pruning_method=ThresholdPruning, threshold= 0.075)
+            parameters_to_prune = ((self.lstm, "weight_ih_l"+str(k)), (self.lstm, "weight_hh_l"+str(k)) )
+            prune.global_unstructured(parameters_to_prune, pruning_method=ThresholdPruning, threshold= 0.125)
         
 
 
