@@ -53,6 +53,7 @@ def compute_quantized_weights(net, k):
         network with non-empty quantized_state_dict
     """
 
+    
     for item in net.state_dict().items():
         weight_name = item[0]
         weights_mat = item[1]
